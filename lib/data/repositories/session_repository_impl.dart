@@ -83,6 +83,7 @@ class SessionRepositoryImpl implements SessionRepository {
         whereArgs: [session.id],
       );
       for (final entry in session.scores.entries) {
+        // entry.key is the player name (scores are keyed by player name)
         await txn.insert('session_scores', {
           'session_id': session.id,
           'player_id': entry.key,
@@ -110,6 +111,7 @@ class SessionRepositoryImpl implements SessionRepository {
         whereArgs: [session.id],
       );
       for (final entry in session.scores.entries) {
+        // entry.key is the player name (scores are keyed by player name)
         await txn.insert('session_scores', {
           'session_id': session.id,
           'player_id': entry.key,

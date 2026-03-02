@@ -36,7 +36,7 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
     _startedAt = DateTime.now();
     final initialScore = widget.gameType == 'mtg' ? 20 : 0;
     _scores = {
-      for (final p in widget.players) p['id'] as String: initialScore,
+      for (final p in widget.players) p['name'] as String: initialScore,
     };
     if (widget.gameType == 'grid') {
       _gridRounds.add(List.filled(widget.players.length, 0));
@@ -54,8 +54,8 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
               icon: const Icon(Icons.settings),
               onSelected: (startLife) {
                 setState(() {
-                  for (final id in _scores.keys) {
-                    _scores[id] = startLife;
+                  for (final name in _scores.keys) {
+                    _scores[name] = startLife;
                   }
                 });
               },
@@ -92,10 +92,9 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
       itemCount: widget.players.length,
       itemBuilder: (ctx, index) {
         final player = widget.players[index];
-        final id = player['id'] as String;
         final name = player['name'] as String;
         final colorHex = player['colorHex'] as String;
-        final score = _scores[id] ?? 0;
+        final score = _scores[name] ?? 0;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -129,23 +128,23 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
                     _ScoreButton(
                       label: '-5',
                       onTap: () =>
-                          setState(() => _scores[id] = score - 5),
+                          setState(() => _scores[name] = score - 5),
                     ),
                     _ScoreButton(
                       label: '-1',
                       onTap: () =>
-                          setState(() => _scores[id] = score - 1),
+                          setState(() => _scores[name] = score - 1),
                     ),
                     _ScoreButton(
                       label: '+1',
                       onTap: () =>
-                          setState(() => _scores[id] = score + 1),
+                          setState(() => _scores[name] = score + 1),
                       filled: true,
                     ),
                     _ScoreButton(
                       label: '+5',
                       onTap: () =>
-                          setState(() => _scores[id] = score + 5),
+                          setState(() => _scores[name] = score + 5),
                       filled: true,
                     ),
                   ],
@@ -164,10 +163,9 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
       itemCount: widget.players.length,
       itemBuilder: (ctx, index) {
         final player = widget.players[index];
-        final id = player['id'] as String;
         final name = player['name'] as String;
         final colorHex = player['colorHex'] as String;
-        final life = _scores[id] ?? 20;
+        final life = _scores[name] ?? 20;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
@@ -197,7 +195,7 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
                       height: 56,
                       child: FilledButton.tonal(
                         onPressed: () =>
-                            setState(() => _scores[id] = life - 1),
+                            setState(() => _scores[name] = life - 1),
                         child: const Text('-1',
                             style: TextStyle(fontSize: 24)),
                       ),
@@ -208,7 +206,7 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
                       height: 56,
                       child: FilledButton(
                         onPressed: () =>
-                            setState(() => _scores[id] = life + 1),
+                            setState(() => _scores[name] = life + 1),
                         child: const Text('+1',
                             style: TextStyle(fontSize: 24)),
                       ),
@@ -361,8 +359,8 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
     if (widget.gameType == 'grid') {
       final totals = <String, int>{};
       for (var i = 0; i < widget.players.length; i++) {
-        final id = widget.players[i]['id'] as String;
-        totals[id] = _gridRounds.fold(0, (sum, round) => sum + round[i]);
+        final name = widget.players[i]['name'] as String;
+        totals[name] = _gridRounds.fold(0, (sum, round) => sum + round[i]);
       }
       return totals;
     }
@@ -447,14 +445,7 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
   }
 
   void _showResultsDialog(Map<String, int> finalScores, String? winnerId) {
-    final winnerName = winnerId != null
-        ? widget.players
-            .firstWhere(
-              (p) => p['id'] == winnerId,
-              orElse: () => {'name': 'Inconnu'},
-            )['name'] as String
-        : null;
-
+    // winnerId is the winner's player name (since scores are keyed by name)
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -463,26 +454,23 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (winnerName != null) ...[
+            if (winnerId != null) ...[
               const Icon(Icons.emoji_events, size: 48, color: Colors.amber),
               const SizedBox(height: 8),
               Text(
-                '🏆 $winnerName gagne!',
+                '🏆 $winnerId gagne!',
                 style: Theme.of(ctx).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const Divider(height: 24),
             ],
             ...finalScores.entries.map((e) {
-              final playerName = widget.players.firstWhere(
-                  (p) => p['id'] == e.key,
-                  orElse: () => {'name': e.key})['name'] as String;
               return ListTile(
                 dense: true,
                 leading: e.key == winnerId
                     ? const Icon(Icons.star, color: Colors.amber)
                     : const Icon(Icons.person_outline),
-                title: Text(playerName),
+                title: Text(e.key),
                 trailing: Text('${e.value} pts',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
               );

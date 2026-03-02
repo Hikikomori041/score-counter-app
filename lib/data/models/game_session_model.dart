@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../domain/entities/game_session.dart';
 
 class GameSessionModel extends GameSession {
@@ -13,13 +12,16 @@ class GameSessionModel extends GameSession {
     super.winnerId,
   });
 
+  /// Builds a [GameSessionModel] from a database row and its associated score rows.
+  /// Score keys are player names for display purposes.
   factory GameSessionModel.fromMap(
     Map<String, dynamic> map,
     List<Map<String, dynamic>> scoreRows,
   ) {
     final scores = <String, int>{};
     for (final row in scoreRows) {
-      scores[row['player_id'] as String] = row['score'] as int;
+      final key = row['player_name'] as String? ?? row['player_id'] as String;
+      scores[key] = row['score'] as int;
     }
     return GameSessionModel(
       id: map['id'] as String,
@@ -60,17 +62,4 @@ class GameSessionModel extends GameSession {
       'winner_id': winnerId,
     };
   }
-
-  List<Map<String, dynamic>> toScoreMaps(Map<String, String> playerNames) {
-    return scores.entries.map((entry) {
-      return {
-        'session_id': id,
-        'player_id': entry.key,
-        'player_name': playerNames[entry.key] ?? entry.key,
-        'score': entry.value,
-      };
-    }).toList();
-  }
-
-  String get scoresJson => jsonEncode(scores);
 }
