@@ -124,9 +124,7 @@ class _SessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    final duration = session.endedAt != null
-        ? session.endedAt!.difference(session.startedAt)
-        : null;
+    final duration = session.endedAt?.difference(session.startedAt);
 
     final sortedScores = session.scores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
