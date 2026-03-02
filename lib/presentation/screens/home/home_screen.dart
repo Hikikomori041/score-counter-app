@@ -8,6 +8,8 @@ import '../../../domain/entities/game.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  static const _gridHeaderId = '__grid_header__';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sortMode = ref.watch(sortModeProvider);
@@ -72,7 +74,7 @@ class HomeScreen extends ConsumerWidget {
                 if (gridGames.isNotEmpty) ...[
                   GameTile(
                     game: Game(
-                      id: '__grid_header__',
+                      id: _gridHeaderId,
                       name: 'Jeux avec grille de score',
                       type: GameType.grid,
                       isFavorite: false,

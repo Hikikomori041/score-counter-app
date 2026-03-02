@@ -371,11 +371,8 @@ class _ScoringScreenState extends ConsumerState<ScoringScreen> {
 
   String? _computeWinnerId(Map<String, int> finalScores) {
     if (finalScores.isEmpty) return null;
-    if (widget.gameType == 'mtg') {
-      return finalScores.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
-    }
+    // For MTG, the player with the most remaining life wins.
+    // For standard and grid, highest score wins.
     return finalScores.entries
         .reduce((a, b) => a.value > b.value ? a : b)
         .key;
